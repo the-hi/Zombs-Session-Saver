@@ -52,7 +52,6 @@ WEBSOCKET_SERVER.on('connection', (CLIENT) => {
             
             if (!SESSION) return;
             SESSION.clients.delete(CLIENT.id);
-            CLIENT.IN_SESSION = undefined;
         }
     });
 });
