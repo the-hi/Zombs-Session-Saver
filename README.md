@@ -64,7 +64,12 @@ export const config = {
 };
 ```
 ------------------------
-4.Run the project
+4. Install node modules
+
+   npm install
+
+------------------------
+5.Run the project
 
   node Start.js
 
