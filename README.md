@@ -13,7 +13,7 @@ Features
 - Simple configuration via config.js
 - A kill cam to see how ur base died
 - Save active WebSocket sessions locally
-- Store session IDs, tokens, or handshake data for later use
+- Store session IDs, and handshake data for later use
 - Reconnect in your browser with the saved session (Admin, Normal, and View only mode)
 
 ---
