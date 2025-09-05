@@ -20,7 +20,7 @@ Features
 
 Prerequisites
 -------------
-- Node.js (v18 or later recommended)
+- Node.js (v18 or later recommended) [https://nodejs.org/en/download/]
 - A Discord Webhook URL (Webhook ID and Token) if you want session logs sent automatically
 
 ---
@@ -53,7 +53,7 @@ Session-Saver Installation Guide
 
   If your Webhook URL is:
 
-  https://discord.com/api/webhooks/1408923573d34689458/_0AFMuvzMwktKeDXssIqSKf162-9wlEGsLlSay_Vzq_THyxfl9tVKqK73js_PU1vXz7hZ
+  `https://discord.com/api/webhooks/1408923573d34689458/_0AFMuvzMwktKeDXssIqSKf162-9wlEGsLlSay_Vzq_THyxfl9tVKqK73js_PU1vXz7hZ`
 
   Then your config would be:
 
