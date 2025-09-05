@@ -6,10 +6,11 @@ const JOIN_SESSION = (sessionId, CLIENT) => {
     const SELECTED_SESSION = SESSIONS.get(+sessionId);
 
     //  join only one session per connection
-    if (CLIENT.IN_SESSION) {
+    if (CLIENT.IN_SESSION !== undefined) {
         SESSIONS.forEach(session => {
             if (session.clients.has(CLIENT.id)) {
-                session.clients.delete(CLIENT.id)
+                session.clients.delete(CLIENT.id);
+                CLIENT.IN_SESSION = undefined;
             }
         })
     }
