@@ -47,11 +47,12 @@ WEBSOCKET_SERVER.on('connection', (CLIENT) => {
 
     CLIENT.on('close', () => {
         if (CLIENT.id) CLIENTS.delete(CLIENT.id);
-        if (CLIENT.IN_SESSION) {
+        if (CLIENT.IN_SESSION !== undefined) {
             const SESSION = SESSIONS.get(CLIENT.IN_SESSION);
             
             if (!SESSION) return;
             SESSION.clients.delete(CLIENT.id);
+            CLIENT.IN_SESSION = undefined;
         }
     });
 });
