@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Session-Saver v2
+// @name         Session-Saver
 // @version      1
 // @description  Session-Saver
 // @author       Skk(Batman)
@@ -569,6 +569,7 @@ class Client {
         game.network.emitter.emit(opcode, packet);
     }
     syncClient(syncNeeds) {
+        console.log(syncNeeds)
         // just for cross compatibility with some scripts
         game.network.socket = { readyState: 1, send: () => {} };
 
@@ -700,6 +701,7 @@ class Client {
     sendSession({ name = 'Player', serverId = undefined, type = 'normal', sessionName = undefined, psk = undefined }) {
         if (!serverId) return window.alert('Enter a valid ServerId')
 
+        console.log({ name, serverId, type, sessionName, psk })
         this.sendPacket(OPCODES.SEND_SESSION, this.encodeJSON({ name, serverId, type, sessionName, psk }))
     }
     getPing() {
