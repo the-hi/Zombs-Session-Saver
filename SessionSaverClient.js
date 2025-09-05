@@ -371,17 +371,7 @@ document.getElementsByClassName("show-intro")[0].onclick = () => {
     if (Object.values(window.client?.sessions).length === 0) return;
     const isSession = Object.values(client.sessions).find(session => session.uid === game.ui.playerTick.uid);
 
-    if (!isSession) {
-        game.ui.components.PopupOverlay.showConfirmation("You are trying to switch from a non-session to a session. This will disconnect the non-session. Do you wish to proceed?", 10000, () => {
-            game.ui.components.Intro.show()
-            game.network.emitter._events.close[0] = function(event) { // prevent reconnecting
-                game.network.connecting = false;
-                game.network.connected = false;
-            }
-            game.network.emitter._events.close[2] = () => {} // prevent reconnection screen
-            game.network.socket.close();
-        });
-    } else {
+    if (isSession) {
         game.ui.components.Intro.show()
     }
 }
@@ -392,8 +382,8 @@ for (let i = 0; i < partyMemberIcons.length; i++) {
      partyMemberIcons[i].addEventListener("click", (e) => {
         if (!window.client || !window.client.sessions) return;
 
-        const isCurrentPlayerSession = Object.values(client.sessions).find(session => session.uid === game.ui.playerTick.uid);
-        if (!isCurrentPlayerSession) return;
+        const isMyPlayerSession = Object.values(client.sessions).find(session => session.uid === game.ui.playerTick.uid);
+        if (!isMyPlayerSession) return;
 
          const isSession = Object.values(client.sessions).find(session => session.uid === game.ui.playerPartyMembers[i].playerUid);
          if (isSession) {
