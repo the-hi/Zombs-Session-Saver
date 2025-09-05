@@ -18,7 +18,13 @@ function onClose() {
             client.close();
         });
         
-        if (webhookClient) webhookClient.send({ content: `Alt with id ${this.options.sessionId} in ${this.options.server} DCED AFTER: ${(this.ticks - this.syncNeeds.enterWorld.startingTick) / 20}seconds.` })
+        if (webhookClient) {
+            webhookClient.send({ 
+                username: "Skk",
+                avatarURL: "https://cdn.wallpapersafari.com/64/11/WkyqrX.jpg",
+                content: `Alt with id ${this.options.sessionId} in ${this.options.server} DCED AFTER: ${(this.ticks - this.syncNeeds.enterWorld.startingTick) / 20}seconds.`           
+            })
+        }
         UPDATE_SESSION_LIST();
 
         delete this;
