@@ -41,7 +41,7 @@ Session-Saver Installation Guide
 
 2.Navigate to the project folder
 
-  cd Session-Saver
+  Open the project folder, right click on the folder and click on "Open in terminal".
 
 ------------------------
 
