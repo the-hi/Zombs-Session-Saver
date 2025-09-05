@@ -64,6 +64,7 @@ export const config = {
 };
 ```
 ------------------------
+
 4. Install node modules
 
 npm install
