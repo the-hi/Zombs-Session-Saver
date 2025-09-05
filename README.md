@@ -66,7 +66,7 @@ export const config = {
 ------------------------
 4. Install node modules
 
-   npm install
+npm install
 
 ------------------------
 5.Run the project
