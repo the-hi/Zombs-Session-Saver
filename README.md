@@ -39,7 +39,7 @@ Session-Saver Installation Guide
 
 ------------------------
 
-3.Navigate to the project folder
+2.Navigate to the project folder
 
   cd Session-Saver
 
