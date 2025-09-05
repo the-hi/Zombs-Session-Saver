@@ -60,7 +60,12 @@ async function makeVideo(snapshots, myPlayerId) {
             console.log(`File size is too big, you can find the video in ${outputPath}`);
         } else {
             const attachment = new AttachmentBuilder(buffer, { name: 'killcam.mp4' });
-            await webhookClient.send({ content: 'Here is how you died.', files: [attachment] });
+            await webhookClient.send({ 
+                username: "Skk",
+                files: [attachment],
+                content: 'Here is how you died.',  
+                avatarURL: "https://cdn.wallpapersafari.com/64/11/WkyqrX.jpg", 
+            });
         }
     } catch (err) {
         console.error('Error creating or sending video:', err);
