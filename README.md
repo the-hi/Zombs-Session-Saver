@@ -71,7 +71,7 @@ export const config = {
 ------------------------
 5.Run the project
 
-   node Start.js
+  node Start.js
 
 ------------------------
 Done
