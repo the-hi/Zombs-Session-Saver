@@ -72,4 +72,3 @@ export const config = {
 Done
 ----
 Your Session-Saver is now running! You can save and restore your game sessions whenever needed.
-# Zombs-Session-Saver
