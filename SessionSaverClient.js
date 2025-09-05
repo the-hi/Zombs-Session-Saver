@@ -2,7 +2,7 @@
 // @name         Session-Saver v2
 // @version      1
 // @description  Session-Saver
-// @author       You
+// @author       Skk(Batman)
 // @run-at       document-idle
 // @match        *://zombs.io/*
 // @match        *://localhost/*
@@ -304,6 +304,7 @@ $('BreakInOff')[0].onclick = () => {
 
     window.client.toggleBreakIn({ toggle: false, serverId, name })
 }
+
 // filler
 $('FillerOn')[0].onclick = () => {
     const psk = $('SessionPSK')[0].value;
@@ -312,11 +313,13 @@ $('FillerOn')[0].onclick = () => {
 
     window.client.toggleAutoFill({ toggle: true, serverId, name, psk })
 }
+
 $('FillerOff')[0].onclick = () => {
     const serverId = $('ServerId')[0].value;
 
     window.client.toggleAutoFill({ toggle: false, serverId })
 }
+
 // party filler
 $('EnableAutoJoin')[0].onclick = () => {
     const serverId = $('ServerId')[0].value;
@@ -347,6 +350,7 @@ $('DeleteAutoJoinPSK')[0].onclick = () => {
 for (const server in serverList) {
     document.getElementsByClassName("serverList")[0].innerHTML += `<option>${server}</option>`
 };
+
 // prevent mouse down when clicking on party members
 game.inputManager.mouseUpHook = game.inputManager._events.mouseUp[1];
 game.inputManager.mouseDownHook = game.inputManager._events.mouseDown[1];
@@ -358,6 +362,7 @@ game.inputManager._events.mouseUp[1] = function(event) {
     if (event.srcElement.innerText === "PL") return;
     game.inputManager.mouseUpHook(event)
 }
+
 // show intro to switch between sessions faster
 document.getElementsByClassName("hud-settings-grid")[0].innerHTML += `<a class="show-intro btn btn-green">Show Intro</a>`;
 document.getElementsByClassName("show-intro")[0].onclick = () => {
@@ -380,11 +385,16 @@ document.getElementsByClassName("show-intro")[0].onclick = () => {
         game.ui.components.Intro.show()
     }
 }
+
 // switch to  party members session by clicking on the party member icon
 const partyMemberIcons = Array.from(document.getElementById("hud-party-icons").children);
 for (let i = 0; i < partyMemberIcons.length; i++) {
      partyMemberIcons[i].addEventListener("click", (e) => {
-         if (!window.client || !window.client.sessions) return;
+        if (!window.client || !window.client.sessions) return;
+
+        const isCurrentPlayerSession = Object.values(client.sessions).find(session => session.uid === game.ui.playerTick.uid);
+        if (!isCurrentPlayerSession) return;
+
          const isSession = Object.values(client.sessions).find(session => session.uid === game.ui.playerPartyMembers[i].playerUid);
          if (isSession) {
              client.joinSession(isSession.sessionId)
