@@ -31,7 +31,7 @@ Session-Saver Installation Guide
 
   Clone the repository:
    
-  git clone https://github.com/the-hi/Session-Saver.git
+  git clone https://github.com/the-hi/Zombs-Session-Saver.git
    
   Or download the ZIP and extract it manually.
 
