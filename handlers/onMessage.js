@@ -18,7 +18,7 @@ function onMessage(msg) {
             onEnterWorld.call(this, this.codec.decode(msg.data));
             break;
         case 10:
-            this.sendPacket(10, { extra: this.codec.decode(new Uint8Array(msg.data), this.Module).extra });
+            this.sendPacket(10, { extra: this.codec.decode(opcode, this.Module).extra });
             return;
         case 5:
             wasmmodule(e => {
