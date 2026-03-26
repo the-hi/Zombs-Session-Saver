@@ -116,6 +116,50 @@ const wasmmodule = (callback, data_12, hostname) => {
         _0x4f7d64$jscomp$0.HEAPU8 = _0x2c159b$jscomp$0 = new Uint8Array(untypedElevationArray);
     };
     function _0x55729a$jscomp$0() {
+        // ensures memory capacity increases when needed
+        const resizeMemory = function (requestedSize) {
+            requestedSize >>>= 0;
+            const maxHeapSize = 2147483647 >>> 0;
+            if (!requestedSize || requestedSize > maxHeapSize) return 0;
+
+            const memory = _0x4f7d64$jscomp$0.asm && _0x4f7d64$jscomp$0.asm.g;
+            if (!memory || !memory.buffer) return 0;
+
+            const pageSize = 65536;
+            const alignUp = (size, alignment) => (size + (alignment - (size % alignment)) % alignment) >>> 0;
+            const maxHeapAligned = alignUp(maxHeapSize, pageSize);
+
+            const growTo = (targetBytes) => {
+                targetBytes = alignUp(targetBytes >>> 0, pageSize);
+                if (targetBytes > maxHeapAligned) targetBytes = maxHeapAligned;
+
+                const oldBytes = memory.buffer.byteLength >>> 0;
+                if (targetBytes <= oldBytes) return true;
+
+                const deltaPages = ((targetBytes - oldBytes + pageSize - 1) / pageSize) | 0;
+                try {
+                    memory.grow(deltaPages);
+                    _0x45ab50$jscomp$0(memory.buffer);
+                    return true;
+                } catch {
+                    return false;
+                }
+            };
+
+            const old = memory.buffer.byteLength >>> 0;
+            const targets = [
+                Math.max(requestedSize, (old * 1.2) >>> 0),
+                Math.max(requestedSize, (old * 1.1) >>> 0),
+                Math.max(requestedSize, requestedSize + 100663296 >>> 0),
+                requestedSize
+            ];
+
+            for (let i = 0; i < targets.length; i++) {
+                if (growTo(Math.min(maxHeapSize, targets[i] >>> 0))) return 1;
+            }
+            return 0;
+        };
+
         function test(component) {
             _0x4f7d64$jscomp$0.asm = component.exports;
             _0x45ab50$jscomp$0(_0x4f7d64$jscomp$0.asm.g.buffer);
@@ -134,7 +178,7 @@ const wasmmodule = (callback, data_12, hostname) => {
         var locals = {
             "a": {
                 "d": () => { },
-                "e": () => { },
+                "e": resizeMemory,
                 "c": _0x2db992$jscomp$0,
                 "f": () => { },
                 "b": _0x1cbea8$jscomp$0,

@@ -1,7 +1,7 @@
 {
   "name": "session-saver",
   "version": "1.0.0",
-  "description": "",
+  "description": "Session-Saver =============",
   "main": "Start.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -19,5 +19,13 @@
     "ffmpeg-static": "^5.2.0",
     "play-sound": "^1.1.6",
     "ws": "^8.18.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/the-hi/Zombs-Session-Saver.git"
+  },
+  "bugs": {
+    "url": "https://github.com/the-hi/Zombs-Session-Saver/issues"
+  },
+  "homepage": "https://github.com/the-hi/Zombs-Session-Saver#readme"
 }

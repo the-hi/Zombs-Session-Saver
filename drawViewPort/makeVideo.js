@@ -38,7 +38,7 @@ async function makeVideo(snapshots, myPlayerId) {
                 });
                 worker.postMessage({ snapshot: snapshots[i], myPlayerId, frameIndex: i });
             });
-            console.log(`[FRAME] ${i}/${snapshots.length}`);
+            if (i % 20 === 0) console.log(`[FRAME] ${i}/${snapshots.length}`);
             await sleep(50);
         }
 
