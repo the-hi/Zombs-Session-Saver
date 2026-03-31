@@ -2,7 +2,7 @@ import { SESSIONS } from "../MakeSession.js";
 import { CLIENT_OPCODES } from "../Start.js";
 import { getEncodedJSON } from "../utils/EncodeJSON.js";
 
-const GET_LEADERBOARDS = (decodedMessage, CLIENT) => {
+const GET_LEADERBOARDS = (_, CLIENT) => {
     const LEADERBOARDS = {};
     SESSIONS.forEach(session => {
         if (!LEADERBOARDS[session.options.server]) {

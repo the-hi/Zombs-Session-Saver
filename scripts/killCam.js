@@ -15,12 +15,12 @@ function recordVideo(building) {
 
     // Stash hit alarms
     if (percentage < STASH_HEALTH_PERCENTAGE && this.scripts.stashHealthAlarm) {
-        playAudio();
+        playAudio('Stash health alarm triggered.');
     }
     // Kill cam logic
     if (processedStash.has(building.uid)) return;
 
-    if (percentage <= KILL_CAM_PERCENTAGE) { 
+    if (percentage <= KILL_CAM_PERCENTAGE) {
         // get video of (killCam length)/10 seconds before the incident
         this.waitTicks(config.killCamLength * 2, () => makeVideo(structuredClone(this.snapShots), this.myPlayer.uid));
 
@@ -36,7 +36,7 @@ function recordVideo(building) {
 
 function killCam() {
     if (this.killCamEvent) return;
-    
+
     this.killCamEvent = true;
     this.emitter.on('buildingHealth', building => recordVideo.call(this, building));
 }

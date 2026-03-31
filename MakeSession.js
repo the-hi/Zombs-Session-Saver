@@ -12,9 +12,11 @@ class Scripts {
             ahrc: false,
             petHeal: true,
             autoHeal: true,
+            autoMove: false,
             autoAim: false,
             petEvolve: true,
             petRevive: true,
+            scoreLogs: true,
             autoAttack: false,
             upgradeAll: false,
             autoFollow: false,
@@ -23,6 +25,7 @@ class Scripts {
             autoUpgrade: false,
             playerTrick: false,
             autoTimeout: false,
+            autoMovePoints: [],
             autoHealSpell: false,
             autoReconnect: false,
             antiPressureBug: false,
@@ -54,6 +57,7 @@ class Session {
         this.ws = Object.assign(new WebSocket(`wss://${this.hostname}:443`, { headers: { "Origin": "", "User-Agent": "" } }), { binaryType: "arraybuffer" });
 
 
+        this.lastScore = 0;
         this.myPlayer = {};
         this.snapShots = [];
         this.buildingInfo = {};
@@ -70,7 +74,7 @@ class Session {
         this.autoUpgradeBuildings = new Map();
         this.missingAutoRebuildBuildings = new Map();
         this.missingAutoUpgradeBuildings = new Map();
-        this.syncNeeds = { messages: [], inventory: {}, buildings: {} };
+        this.syncNeeds = { scoreLogs: [], messages: [], inventory: {}, buildings: {} };
 
         this.ws.onerror = () => { }
         this.ws.onclose = onClose.bind(this);
@@ -151,7 +155,7 @@ class Session {
     makeBuilding(type, { x, y }, yaw) {
         const halfWidth = ["Wall", "SlowTrap", "Door"].includes(type) ? 24 : 48;
 
-        const occupiedCells = this.SpatialHash.queryOccupiedCells(this.options.sessionId, { x,y }, halfWidth - 1);
+        const occupiedCells = this.SpatialHash.queryOccupiedCells(this.options.sessionId, { x, y }, halfWidth - 1);
 
         if (!occupiedCells) this.sendRpc({ name: "MakeBuilding", type, x, y, yaw });
     }
@@ -239,7 +243,7 @@ class Session {
 
     loadLb() {
         this.sendPacket(7, {});
-        
+
         for (let i = 0; i < 26; i++) this.sendInput({ up: 1, left: 1 });
         this.ws.send(new Uint8Array([9, 6, 0, 0, 0, 126, 8, 0, 0, 108, 27, 0, 0, 146, 23, 0, 0, 82, 23, 0, 0, 8, 91, 11, 0, 8, 91, 11, 0, 0, 0, 0, 0, 32, 78, 0, 0, 76, 79, 0, 0, 172, 38, 0, 0, 120, 155, 0, 0, 166, 39, 0, 0, 140, 35, 0, 0, 36, 44, 0, 0, 213, 37, 0, 0, 100, 0, 0, 0, 120, 55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 134, 6, 0, 0]));
     }

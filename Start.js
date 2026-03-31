@@ -30,6 +30,7 @@ const CLIENT_OPCODES = {
     SYNC_EXISTING_SESSIONS: 7,
     ACCESS_VERIFIED: 8,
     PING_TEST: 9,
+    SCORE_LOGS: 10,
 }
 
 const CLIENTS = new Map();

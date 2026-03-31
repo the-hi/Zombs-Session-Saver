@@ -3,7 +3,7 @@ import { tmpdir } from 'os';
 import { promises as fs } from 'fs';
 import { Worker } from 'worker_threads';
 import { AttachmentBuilder } from 'discord.js';
-import { webhookClient } from "../utils/Webhook.js";
+import { sendMessage, webhook } from "../utils/Webhook.js";
 
 let isMaking = false;
 let startedGeneration = Date.now();
@@ -11,10 +11,10 @@ const MAX_DISCORD_FILE_SIZE = 8 * 1024 * 1024; // 8 MB
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 
 async function makeVideo(snapshots, myPlayerId) {
-    if (!webhookClient) return console.log("Webhook not set up.");
+    if (!webhook) return console.log("Webhook not set up.");
     if (isMaking) return console.log("Video already being generated.");
 
-    const tempDir = path.join(tmpdir(), `frames-${Math.random().toString(36).slice(2,10)}`);
+    const tempDir = path.join(tmpdir(), `frames-${Math.random().toString(36).slice(2, 10)}`);
     await fs.mkdir(tempDir, { recursive: true });
     const outputPath = path.join(tempDir, 'output.mp4');
 
@@ -39,7 +39,7 @@ async function makeVideo(snapshots, myPlayerId) {
                 worker.postMessage({ snapshot: snapshots[i], myPlayerId, frameIndex: i });
             });
             if (i % 20 === 0) console.log(`[FRAME] ${i}/${snapshots.length}`);
-            await sleep(50);
+            await sleep(100);
         }
 
         worker.postMessage({ done: true });
@@ -60,12 +60,7 @@ async function makeVideo(snapshots, myPlayerId) {
             console.log(`File size is too big, you can find the video in ${outputPath}`);
         } else {
             const attachment = new AttachmentBuilder(buffer, { name: 'killcam.mp4' });
-            await webhookClient.send({ 
-                username: "Skk",
-                files: [attachment],
-                content: 'Here is how you died.',  
-                avatarURL: "https://cdn.wallpapersafari.com/64/11/WkyqrX.jpg", 
-            });
+            sendMessage('Here is how you died.', [attachment]);
         }
     } catch (err) {
         console.error('Error creating or sending video:', err);

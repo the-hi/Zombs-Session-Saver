@@ -1,6 +1,6 @@
 import { SESSIONS } from "../MakeSession.js";
 
-const PING_TEST = (decodedMessage, CLIENT) => {
+const PING_TEST = (_, CLIENT) => {
     const SELECTED_SESSION = SESSIONS.get(CLIENT.IN_SESSION);
     if (SELECTED_SESSION) {
         SELECTED_SESSION.lastPing = Date.now();

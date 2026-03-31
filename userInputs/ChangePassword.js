@@ -1,5 +1,5 @@
 import { config } from "../Config.js";
-import { webhookClient } from "../utils/Webhook.js";
+import { sendMessage } from "../utils/Webhook.js";
 
 const CHANGE_PASSWORD = (decodedMessage, CLIENT) => {
     const { newPassword, type } = JSON.parse(decodedMessage);
@@ -10,7 +10,7 @@ const CHANGE_PASSWORD = (decodedMessage, CLIENT) => {
         if (password) {
             password = newPassword;
             console.log(`${key} password got changed to: ${newPassword}`);
-            if (webhookClient) webhookClient.send({ content: `${key} password got changed to: ${newPassword}` });
+            sendMessage(`${key} password got changed to: ${newPassword}`);
         }
     }
 };

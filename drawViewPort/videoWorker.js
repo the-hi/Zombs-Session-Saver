@@ -9,9 +9,8 @@ const { outputPath } = workerData;
 const ffmpeg = spawn(ffmpegPath, [
     '-y',
     '-loglevel', 'error',
-    '-f', 'rawvideo',
-    '-pix_fmt', 'rgba',
-    '-s', `${config.killCamResolution}x${config.killCamResolution}`,
+    '-f', 'image2pipe',
+    '-vcodec', 'mjpeg',
     '-r', '20',
     '-i', 'pipe:0',
     '-c:v', 'libx264',

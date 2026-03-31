@@ -1,5 +1,6 @@
 import { onFailure } from './onFailure.js';
 import { onShutDown } from './onShutDown.js';
+import { onDayCycle } from './onDayCycle.js';
 import { onPartyInfo } from './onPartyInfo.js';
 import { playAudio } from '../utils/Alarms.js';
 import { onBuildingUpdate } from './onBuildingUpdate.js';
@@ -17,7 +18,7 @@ function onRpc(data) {
             onPartyInfo.call(this, data);
             break;
         case "DayCycle":
-            this.syncNeeds.dayCycle = data;
+            onDayCycle.call(this, data);
             break;
         case 'Leaderboard':
             this.syncNeeds.leaderboard = data;
@@ -44,9 +45,7 @@ function onRpc(data) {
             this.buildingInfo[data.name] = data.response;
             break;
         case 'Dead':
-            if (this.scripts.autoRespawn) {
-                this.sendInput({ respawn: 1 });
-            }
+            if (this.scripts.autoRespawn) this.sendInput({ respawn: 1 });
             break;
         case "SetPartyList":
             this.syncNeeds.parties = data;
@@ -54,7 +53,7 @@ function onRpc(data) {
             this.pop = 0;
             data.response.forEach((party) => this.pop += party.memberCount);
 
-            if (this.scripts.serverFullAlarm && this.pop === 32) playAudio();
+            if (this.scripts.serverFullAlarm && this.pop === 32) playAudio(`${this.options.server} is full.`);
             break;
         case "ReceiveChatMessage":
             this.syncNeeds.messages.push(data);

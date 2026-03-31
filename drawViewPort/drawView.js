@@ -177,7 +177,7 @@ const drawViewPort = async (entities, myPlayer) => {
         }
     }
 
-    return canvas.toBuffer('raw');
+    return canvas.toBuffer('image/jpeg');
 };
 
 export { getImage, drawViewPort };

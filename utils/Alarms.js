@@ -5,16 +5,18 @@ import player from 'play-sound';
 import { spawn } from 'child_process';
 import ffmpegPath from 'ffmpeg-static';
 import { fileURLToPath } from 'node:url';
+import { sendMessage } from '../utils/Webhook.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 let isPlaying = false;
 
-const playAudio = async (fileName = 'alarmsSessionSaver.mp3') => {
+const playAudio = async (message) => {
     if (isPlaying) return;
 
-    const filePath = path.join(__dirname, fileName); 
+    const fileName = 'alarmsSessionSaver.mp3';
+    const filePath = path.join(__dirname, fileName);
     const platform = os.platform();
 
     if (!fs.existsSync(filePath)) {
@@ -54,6 +56,7 @@ const playAudio = async (fileName = 'alarmsSessionSaver.mp3') => {
             isPlaying = false;
         });
     }
+    if (message !== undefined) sendMessage(message);
 };
 
 export { playAudio };

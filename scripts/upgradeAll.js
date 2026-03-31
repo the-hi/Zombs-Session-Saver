@@ -1,19 +1,41 @@
 const MAX_STASH_TIER = 8;
 const MAX_UPGRADE_DISTANCE = 768;
 
+const stashCosts = [0, 5000, 10000, 16000, 20000, 32000, 100000, 400000];
+const priority = ['GoldStash', "GoldMine", "Harvester", "MagicTower", "BombTower", "ArrowTower", "CannonTower", "MeleeTower", "Door", "Wall", "SlowTrap"];
+
+function filterTowers() {
+    // filter buildings that can be upgraded 
+    const buildingsInRange = [];
+    this.buildings.forEach((building) => {
+        if (this.getDistance(building) <= MAX_UPGRADE_DISTANCE && building.tier < MAX_STASH_TIER) {
+            // filter buildings out of range, max level buildings and if u dont have enough gold to upgrade stash;
+            if (building.tier === this.myStash.tier && building.type !== 'GoldStash' && building.tier !== 8) return;
+            if (building.type === 'GoldStash' && this.myPlayer.gold <= stashCosts[building.tier]) return;
+
+            buildingsInRange.push(building);
+        }
+    })
+    // filter buildings according to priority
+    const sortedBuildings = buildingsInRange.sort((a, b) => {
+        const priorityDiff = priority.indexOf(a.type) - priority.indexOf(b.type);
+
+        if (priorityDiff === 0) return a.tier - b.tier;
+
+        return priorityDiff;
+    });
+    return sortedBuildings;
+}
+
 function upgradeAll() {
     if (!this.myStash || !this.scripts.upgradeAll) return;
 
-    if (this.ticks % 50 !== 0) return;
-    
-    this.buildings.forEach((building) => { // upgrade all towers and harvesters every 2.5 seconds.
-        if (!building.type.includes("Tower") && !['Harvester', 'GoldStash', 'GoldMine'].includes(building.type)) return;
+    if (this.ticks % 10 !== 0) return;
 
-        if (this.getDistance(building) <= MAX_UPGRADE_DISTANCE && building.tier < MAX_STASH_TIER) {
-            if (building.tier === this.myStash.tier && building.type !== 'GoldStash') return;
+    const sortedBuildings = filterTowers.call(this);
 
-            this.upgradeBuilding(building.uid);
-        }
+    sortedBuildings.slice(0, 200).forEach(building => {
+        this.upgradeBuilding(building.uid);
     })
 };
 

@@ -30,7 +30,12 @@ const SCRIPT_OPCODES = {
     24: 'towerDeathAlarm',
     25: 'stashHealthAlarm',
     26: 'disconnectAlarm',
-    27: 'serverFullAlarm'
+    27: 'serverFullAlarm',
+    28: 'scoreLogs',
+    29: 'deleteScoreLogs',
+    30: 'addPoint',
+    31: 'clearPoints',
+    32: 'autoMove',
 }
 
 const TOGGLE_SCRIPTS = (msg, CLIENT) => {
@@ -38,55 +43,65 @@ const TOGGLE_SCRIPTS = (msg, CLIENT) => {
 
     if (!SCRIPT_TYPE) return;
 
-    const json = JSON.parse(new TextDecoder().decode(msg.subarray(1)));
+    let json = JSON.parse(new TextDecoder().decode(msg.subarray(1)));
 
     const { toggle, sessionId } = json;
     const SELECTED_SESSION = SESSIONS.get(sessionId || CLIENT.IN_SESSION);
 
-    if (SELECTED_SESSION) {
-        switch (SCRIPT_TYPE) {
-            case 'autoUpgrade':
-                SELECTED_SESSION.scripts[SCRIPT_TYPE] = toggle;
-                SELECTED_SESSION.setBuildingTier();
-                if (!toggle) {
-                    SELECTED_SESSION.autoUpgradeBuildings.clear();
-                    SELECTED_SESSION.missingAutoUpgradeBuildings.clear();
-                }
-                break;
-            case 'autoAimTarget':
-                if (!["players", "zombies"].includes(json.target)) return;
+    if (!SELECTED_SESSION) return;
 
-                SELECTED_SESSION.scripts[SCRIPT_TYPE] = json.target;
-                break;   
-            case 'playerTrickType':
-                if (!["normal", "reverse"].includes(json.type)) return;
+    switch (SCRIPT_TYPE) {
+        case 'deleteScoreLogs':
+            SELECTED_SESSION.syncNeeds.scoreLogs = [];
+            break;
+        case 'clearPoints':
+            SELECTED_SESSION.scripts.autoMovePoints = [];
+            break;
+        case 'addPoint':
+            json = SELECTED_SESSION.myPlayer.position;
+            SELECTED_SESSION.scripts.autoMovePoints.push(SELECTED_SESSION.myPlayer.position);
+            break;
+        case 'autoUpgrade':
+            SELECTED_SESSION.scripts[SCRIPT_TYPE] = toggle;
+            SELECTED_SESSION.setBuildingTier();
+            if (!toggle) {
+                SELECTED_SESSION.autoUpgradeBuildings.clear();
+                SELECTED_SESSION.missingAutoUpgradeBuildings.clear();
+            }
+            break;
+        case 'autoAimTarget':
+            if (!["players", "zombies"].includes(json.target)) return;
 
-                SELECTED_SESSION.scripts[SCRIPT_TYPE] = json.type;
-                break;
-            case 'autoAttackDistance':
-                if (typeof json.distance !== 'number') return;
+            SELECTED_SESSION.scripts[SCRIPT_TYPE] = json.target;
+            break;
+        case 'playerTrickType':
+            if (!["normal", "reverse"].includes(json.type)) return;
 
-                SELECTED_SESSION.scripts[SCRIPT_TYPE] = json.distance;  
-                break;
-            case 'playerTrick':
-                SELECTED_SESSION.scripts[SCRIPT_TYPE] = toggle;
-                SELECTED_SESSION.scripts.playerTrickPsk = json.psk;
-                break;
-            case 'positionLock':
-                SELECTED_SESSION.scripts.lockAt = SELECTED_SESSION.myPlayer.position;
-                SELECTED_SESSION.scripts[SCRIPT_TYPE] = toggle;
-                break;
-            case 'autoRebuild':
-                SELECTED_SESSION.setBuildings();
-                if (!toggle) {
-                    SELECTED_SESSION.autoRebuildBuildings.clear();
-                    SELECTED_SESSION.missingAutoRebuildBuildings.clear();
-                }
-            default:
-                SELECTED_SESSION.scripts[SCRIPT_TYPE] = toggle;
-        }
-        SELECTED_SESSION.broadCastPacket(CLIENT_OPCODES.UPDATE_SCRIPTS, getEncodedJSON({ script: SCRIPT_TYPE, json: json }));
+            SELECTED_SESSION.scripts[SCRIPT_TYPE] = json.type;
+            break;
+        case 'autoAttackDistance':
+            if (typeof json.distance !== 'number') return;
+
+            SELECTED_SESSION.scripts[SCRIPT_TYPE] = json.distance;
+            break;
+        case 'playerTrick':
+            SELECTED_SESSION.scripts[SCRIPT_TYPE] = toggle;
+            SELECTED_SESSION.scripts.playerTrickPsk = json.psk;
+            break;
+        case 'positionLock':
+            SELECTED_SESSION.scripts.lockAt = SELECTED_SESSION.myPlayer.position;
+            SELECTED_SESSION.scripts[SCRIPT_TYPE] = toggle;
+            break;
+        case 'autoRebuild':
+            SELECTED_SESSION.setBuildings();
+            if (!toggle) {
+                SELECTED_SESSION.autoRebuildBuildings.clear();
+                SELECTED_SESSION.missingAutoRebuildBuildings.clear();
+            }
+        default:
+            SELECTED_SESSION.scripts[SCRIPT_TYPE] = toggle;
     }
+    SELECTED_SESSION.broadCastPacket(CLIENT_OPCODES.UPDATE_SCRIPTS, getEncodedJSON({ script: SCRIPT_TYPE, json }));
 };
 
 export { TOGGLE_SCRIPTS };

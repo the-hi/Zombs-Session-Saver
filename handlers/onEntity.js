@@ -1,7 +1,7 @@
 import { config } from "../Config.js";
 import { modelToNumber } from "../utils/Models.js";
 
-const essentialAttributes = ["name","position", "tier", "yaw", "aimingYaw", "health", "model", "weaponName", "weaponTier"];
+const essentialAttributes = ["name", "position", "tier", "yaw", "aimingYaw", "health", "model", "weaponName", "weaponTier"];
 
 function onEntity(data) {
     data.entities.forEach((entity, key) => {
@@ -15,7 +15,7 @@ function onEntity(data) {
             if (entity.model.includes("Projectile")) return;
             if (entity.model === 'GamePlayer') this.players.set(key, entity);
             if (entity.model.startsWith('Zombie')) this.zombies.set(key, entity);
-            
+
             const size = entity.collisionRadius !== 0 ? entity.collisionRadius : entity.width / 2;
             this.SpatialHash.addEntity(this.options.sessionId, entity.uid, entity.position, size);
         } else {
@@ -55,7 +55,7 @@ function onEntity(data) {
     );
 
     if (this.myPet) this.petActivated = true;
-    
+
     if (this.tickCallBacks[this.ticks]) {
         this.tickCallBacks[this.ticks].forEach(callback_func => {
             callback_func.call(this);
@@ -64,7 +64,7 @@ function onEntity(data) {
 
     this.scriptFunctions.forEach((script_callback, key) => {
         if (this.options.type === 'filler') return; // if the session is a filler session, we don't need to do anything else
-        
+
         try {
             if (script_callback) script_callback.call(this);
         } catch (err) {
@@ -74,13 +74,14 @@ function onEntity(data) {
     })
 
     // Create a snapshot (the code is ass lmfao)
+    if (this.ticks % 2 === 0) return;
     const entityEssentials = new Map();
 
     structuredClone(this.entities).forEach(entity => {
         const _entity = {};
         for (let attribute in entity) {
-             let property = entity[attribute]; 
-             if (essentialAttributes.includes(attribute)) {
+            let property = entity[attribute];
+            if (essentialAttributes.includes(attribute)) {
                 if (attribute === "health") {
                     if (entity.maxHealth === entity.health) continue;
 
@@ -109,13 +110,13 @@ function onEntity(data) {
                     }
                 };
                 _entity[attribute] = property;
-             }
+            }
         }
         entityEssentials.set(entity.uid, _entity);
     })
 
     this.snapShots.push(entityEssentials);
-    if (this.snapShots.length > config.killCamLength * 20) {
+    if (this.snapShots.length > config.killCamLength * 10) {
         this.snapShots.shift(); // remove oldest snapshot
     };
 };

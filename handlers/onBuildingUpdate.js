@@ -55,7 +55,7 @@ function onBuildingUpdate(data) {
 
             if (this.scripts.towerDeathAlarm) {
                 if (type.includes("Tower") || ["Harvester", "GoldMine"].includes(type)) {
-                    playAudio();
+                    playAudio('Tower death alarm triggered.');
                 }
             }
 

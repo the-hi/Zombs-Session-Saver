@@ -24,6 +24,7 @@ const CLIENT_OPCODES = {
     7: 'SYNC_EXISTING_SESSIONS',
     8: 'ACCESS_VERIFIED',
     9: 'PING_TEST',
+    10: 'SCORE_LOGS'
 };
 
 const OPCODES = {
@@ -49,6 +50,8 @@ const BINCODEC_PACKETS = {
     4: 'PACKET_ENTER_WORLD',
 }
 
+const [serverId, shareKey] = window.location.hash.replace("#/", "").split("/");
+
 document.querySelector('.hud-intro-left').innerHTML = `<div class="ad-unit ad-unit-medrec ad-unit-medrec-atf" style="width: auto; height: auto;" bis_skin_checked="1"><div class="session_saver"></div></div>`;
 document.getElementsByClassName("hud-intro-guide")[0].style.width = "300px";
 document.getElementsByClassName("hud-intro-guide")[0].style.height = "282px";
@@ -58,8 +61,8 @@ document.getElementsByClassName("session_saver")[0].innerHTML = `
     <h5></h5>
     <input class="SessionName" type="text" placeholder="Enter Session Name" maxlength="20">
     <input class="PlayerName" type="text" placeholder="Enter player name">
-    <input class="ServerId" type="text" placeholder="Enter server id">
-    <input class="SessionPSK" type="text" placeholder="Enter party key" maxlength="20">
+    <input class="ServerId" type="text" placeholder="Enter server id" value=${serverId ? serverId : ''}>
+    <input class="SessionPSK" type="text" placeholder="Enter party key" maxlength="20" value=${shareKey ? shareKey : ''}>
     <input class="CloseSessionInput" type="text" placeholder="SessionId">
     <button class="CloseSession" style="width: 45%">Close Session</button>
     <button class="BreakInOn" style="width: 22%">Enable Break In</button>
@@ -257,6 +260,7 @@ $('btn btn-green hud-intro-play')[1].onclick = () => {
     const serverId = $('ServerId')[0].value === '' ? $('hud-intro-server')[0].value : $('ServerId')[0].value;
     const sessionName = $('SessionName')[0].value == '' ? undefined : $('SessionName')[0].value;
 
+    if (!window.client) return;
     window.client.sendSession({ name, serverId, type: 'normal', sessionName, psk })
 }
 
@@ -286,6 +290,8 @@ $('ChangeServer')[0].onclick = () => {
 // close a session
 $('CloseSession')[0].onclick = () => {
     const sessionId = parseInt($('CloseSessionInput')[0].value) || undefined;
+
+    if (!window.client) return;
     window.client.closeSession(sessionId)
 }
 
@@ -295,6 +301,7 @@ $('BreakInOn')[0].onclick = () => {
     const name = $('PlayerName')[0].value;
     const serverId = $('ServerId')[0].value;
 
+    if (!window.client) return;
     window.client.toggleBreakIn({ toggle: true, serverId, name, psk })
 }
 
@@ -311,12 +318,14 @@ $('FillerOn')[0].onclick = () => {
     const name = $('PlayerName')[0].value;
     const serverId = $('ServerId')[0].value;
 
+    if (!window.client) return;
     window.client.toggleAutoFill({ toggle: true, serverId, name, psk })
 }
 
 $('FillerOff')[0].onclick = () => {
     const serverId = $('ServerId')[0].value;
 
+    if (!window.client) return;
     window.client.toggleAutoFill({ toggle: false, serverId })
 }
 
@@ -324,11 +333,14 @@ $('FillerOff')[0].onclick = () => {
 $('EnableAutoJoin')[0].onclick = () => {
     const serverId = $('ServerId')[0].value;
 
+    if (!window.client) return;
     window.client.toggleAutoJoin({ toggle: true, serverId })
 }
 
 $('DisableAutoJoin')[0].onclick = () => {
     const serverId = $('ServerId')[0].value;
+
+    if (!window.client) return;
     window.client.toggleAutoJoin({ toggle: false, serverId })
 }
 
@@ -336,6 +348,7 @@ $('AddAutoJoinPSK')[0].onclick = () => {
     const psk = $('SessionPSK')[0].value;
     const serverId = $('ServerId')[0].value;
 
+    if (!window.client) return;
     window.client.toggleAutoJoin({ toggle: 'add', serverId, psk })
 }
 
@@ -343,6 +356,7 @@ $('DeleteAutoJoinPSK')[0].onclick = () => {
     const psk = $('SessionPSK')[0].value;
     const serverId = $('ServerId')[0].value;
 
+    if (!window.client) return;
     window.client.toggleAutoJoin({ toggle: 'delete', serverId, psk })
 }
 
@@ -354,17 +368,68 @@ for (const server in serverList) {
 // prevent mouse down when clicking on party members
 game.inputManager.mouseUpHook = game.inputManager._events.mouseUp[1];
 game.inputManager.mouseDownHook = game.inputManager._events.mouseDown[1];
-game.inputManager._events.mouseDown[1] = function(event) {
+game.inputManager._events.mouseDown[1] = function (event) {
     if (event.srcElement.innerText === "PL") return;
     game.inputManager.mouseDownHook(event)
 }
-game.inputManager._events.mouseUp[1] = function(event) {
+game.inputManager._events.mouseUp[1] = function (event) {
     if (event.srcElement.innerText === "PL") return;
     game.inputManager.mouseUpHook(event)
 }
 
 // show intro to switch between sessions faster
-document.getElementsByClassName("hud-settings-grid")[0].innerHTML += `<a class="show-intro btn btn-green">Show Intro</a>`;
+document.getElementsByClassName("hud-settings-grid")[0].innerHTML = `
+<a class="show-intro btn btn-green" style="padding: 0 234px">Show Intro</a>
+<style>
+  table.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+  }
+  .custom-table th,
+  .custom-table td {
+    border: 1px solid white;
+    padding: 6px;
+  }
+  .custom-table th {
+    background-color: #333;
+    color: white;
+  }
+</style>
+
+<table class="custom-table">
+  <thead>
+    <tr>
+      <th>Index</th>
+      <th>Wave</th>
+      <th>Score</th>
+      <th>Score gain</th>
+      <th>Average gain</th>
+      <th>Highest gain</th>
+    </tr>
+  </thead>
+  <tbody id="score-logs"></tbody>
+</table>
+`;
+
+let scoreIndex = 0;
+const addScoreLog = ({ wave, score, spw, aspw, highestSpw }) => {
+    const tbody = document.getElementById("score-logs");
+
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+    <td>${++scoreIndex}</td>
+    <td>${wave.toLocaleString()}</td>
+    <td>${score.toLocaleString()}</td>
+    <td>${spw.toLocaleString()}</td>
+    <td>${aspw.toLocaleString()}</td>
+    <td>${highestSpw.toLocaleString()}</td>
+  `;
+
+    tbody.appendChild(row);
+}
+
 document.getElementsByClassName("show-intro")[0].onclick = () => {
     if (!game.ui.getPlayerTick()) return;
     if (!window.client || !window.client.sessions) return;
@@ -379,17 +444,18 @@ document.getElementsByClassName("show-intro")[0].onclick = () => {
 // switch to  party members session by clicking on the party member icon
 const partyMemberIcons = Array.from(document.getElementById("hud-party-icons").children);
 for (let i = 0; i < partyMemberIcons.length; i++) {
-     partyMemberIcons[i].addEventListener("click", (e) => {
+    partyMemberIcons[i].addEventListener("click", (e) => {
         if (!window.client || !window.client.sessions) return;
 
-        const isMyPlayerSession = Object.values(client.sessions).find(session => session.uid === game.ui.playerTick.uid);
-        if (!isMyPlayerSession) return;
+        const isMyPlayerSession = game.ui.playerPartyMembers[i].playerUid === game.ui.playerTick.uid;
+        if (isMyPlayerSession) return;
 
-         const isSession = Object.values(client.sessions).find(session => session.uid === game.ui.playerPartyMembers[i].playerUid);
-         if (isSession) {
-             client.joinSession(isSession.sessionId)
-         }
-     })
+        const isSession = Object.values(client.sessions).find(session => session.uid === game.ui.playerPartyMembers[i].playerUid);
+        if (isSession) {
+            console.log(isSession)
+            client.joinSession(isSession.sessionId)
+        }
+    })
 }
 
 let dimension = 1;
@@ -449,7 +515,12 @@ const SCRIPT_OPCODES = {
     'towerDeathAlarm': 24,
     'stashHealthAlarm': 25,
     'disconnectAlarm': 26,
-    'serverFullAlarm': 27
+    'serverFullAlarm': 27,
+    'scoreLogs': 28,
+    'deleteScoreLogs': 29,
+    'addPoint': 30,
+    'clearPoints': 31,
+    'autoMove': 32,
 };
 
 const scriptToggles = {
@@ -457,6 +528,9 @@ const scriptToggles = {
     petHeal: "ph",
     autoAim: "aa",
     autoHeal: "ah",
+    autoMove: "am",
+    addPoint: "sp",
+    scoreLogs: 'sl',
     petEvolve: "pe",
     petRevive: "pr",
     autoFollow: "af",
@@ -464,6 +538,7 @@ const scriptToggles = {
     autoRespawn: "ar",
     autoUpgrade: "au",
     playerTrick: "pt",
+    clearPoints: "cps",
     autoRebuild: "arb",
     autoTimeout: "aito",
     autoAttack: "space",
@@ -476,6 +551,7 @@ const scriptToggles = {
     antiPressureBug: "apb",
     playerTrickType: "ptt",
     towerDeathAlarm: "tda",
+    deleteScoreLogs: 'dsl',
     serverFullAlarm: "sfa",
     autoSwitchWeapon: "aws",
     stashHealthAlarm: "sha",
@@ -495,7 +571,7 @@ function getAcronym(acronym) {
 let autoFollow = false;
 document.addEventListener("keypress", key => {
     if (document.activeElement.tagName.toLowerCase() == "textbox" || document.activeElement.tagName.toLowerCase() == "input" || !game.world.inWorld) return;
-    if(key.code == "KeyG" && window.client?.in_session) client.toggleScript("autoFollow", { toggle: (autoFollow = !autoFollow) })
+    if (key.code == "KeyG" && window.client?.in_session) client.toggleScript("autoFollow", { toggle: (autoFollow = !autoFollow) })
 })
 
 const handleChatMessage = (message, packet) => {
@@ -504,16 +580,24 @@ const handleChatMessage = (message, packet) => {
     const split = message.split(" ");
     const scriptName = getAcronym(split[0].replaceAll("!", ""));
 
-    if (message.toLowerCase() === "!ping") return client.getPing();
-    if (split[0].toLowerCase() === "!leave") return game.network.sendPacket(9, {name: "LeaveParty"});
-    if (split[0].toLowerCase() === "!join") return game.network.sendPacket(9, { name: "JoinPartyByShareKey", partyShareKey: split[1]});
+    if (message.toLowerCase() === "!ping" && window.client) return client.getPing();
+    if (split[0].toLowerCase() === "!leave") return game.network.sendPacket(9, { name: "LeaveParty" });
+    if (split[0].toLowerCase() === "!join") return game.network.sendPacket(9, { name: "JoinPartyByShareKey", partyShareKey: split[1] });
 
     if (!scriptName) {
+        if (!window.client) return;
         client.sendPacket(OPCODES.SEND_PACKET, packet);
         return;
     };
 
     switch (scriptName) {
+        case 'deleteScoreLogs':
+            client.toggleScript(scriptName, {});
+
+            scoreIndex = 0;
+            let logs = document.getElementById("score-logs");
+            while (logs.firstChild) logs.removeChild(logs.firstChild);
+            break;
         case 'playerTrickType':
             client.toggleScript(scriptName, { type: split[1] })
             break;
@@ -524,7 +608,7 @@ const handleChatMessage = (message, packet) => {
             client.toggleScript(scriptName, { target: split[1] });
             break;
         case 'playerTrick':
-            client.toggleScript(scriptName, { toggle: toggle, psk: !split[1] ? game.ui.playerPartyShareKey :  split[1] })
+            client.toggleScript(scriptName, { toggle: toggle, psk: !split[1] ? game.ui.playerPartyShareKey : split[1] })
             break;
         default:
             client.toggleScript(scriptName, { toggle: toggle })
@@ -569,8 +653,9 @@ class Client {
         game.network.emitter.emit(opcode, packet);
     }
     syncClient(syncNeeds) {
+        console.log(syncNeeds)
         // just for cross compatibility with some scripts
-        game.network.socket = { readyState: 1, send: () => {} };
+        game.network.socket = { readyState: 1, send: () => { } };
 
         for (const rpc of ["enterWorld", "buildings", "entities", "dayCycle", "partyInfo", "leaderboard", "parties", "psk"]) {
             this.emitPacket(BINCODEC_PACKETS[syncNeeds[rpc].opcode], syncNeeds[rpc]);
@@ -580,6 +665,9 @@ class Client {
         }
         for (const message of syncNeeds.messages) {
             this.emitPacket(BINCODEC_PACKETS[9], message);
+        }
+        for (const entry of syncNeeds.scoreLogs) {
+            addScoreLog({ wave: entry[0], score: entry[1], spw: entry[2], aspw: entry[3], highestSpw: entry[4] })
         }
         game.options.serverId = syncNeeds.options.server;
         setTimeout(() => {
@@ -597,7 +685,7 @@ class Client {
 
             if (packet.name === 'SendChatMessage') {
                 packet.message.split(";").forEach(message => {
-                   handleChatMessage(message.trim(), Array.from(encoded))
+                    handleChatMessage(message.trim(), Array.from(encoded))
                 })
                 return;
             };
@@ -625,13 +713,16 @@ class Client {
 
         data = JSON.parse(new TextDecoder().decode(data));
         switch (OPCODE) {
+            case 'SCORE_LOGS':
+                addScoreLog(data)
+                break;
             case 'ACCESS_VERIFIED':
                 if (!data.verified) console.error('ACCESS IS DENIED');
                 break;
             case 'SYNC_EXISTING_SESSIONS':
                 this.sessions = data.sessions ? data.sessions : data;
 
-                if (data.psks){
+                if (data.psks) {
                     $('session_saver')[0].getElementsByTagName('h5')[0].innerText = data.psks.join(", ")
                 }
                 $("savedsessions")[0].innerHTML = ``;
@@ -682,7 +773,7 @@ class Client {
 
         this.sendPacket(OPCODES.TOGGLE_AUTO_BREAK_IN, this.encodeJSON({ toggle, serverId, name, psk }))
     }
-    changePassword({changedPassword = undefined, type = 'normal' }) { // type = admin, normal, view. you need to use admin password when joining the game.
+    changePassword({ changedPassword = undefined, type = 'normal' }) { // type = admin, normal, view. you need to use admin password when joining the game.
         this.sendPacket(OPCODES.CHANGE_PASSWORD, this.encodeJSON({ changedPassword, type }))
     }
     toggleScript(type, additional) {
