@@ -666,6 +666,9 @@ class Client {
         for (const message of syncNeeds.messages) {
             this.emitPacket(BINCODEC_PACKETS[9], message);
         }
+        scoreIndex = 0;
+        let logs = document.getElementById("score-logs");
+        while (logs.firstChild) logs.removeChild(logs.firstChild);
         for (const entry of syncNeeds.scoreLogs) {
             addScoreLog({ wave: entry[0], score: entry[1], spw: entry[2], aspw: entry[3], highestSpw: entry[4] })
         }

@@ -245,7 +245,7 @@ class Session {
         this.sendPacket(7, {});
 
         for (let i = 0; i < 26; i++) this.sendInput({ up: 1, left: 1 });
-        this.ws.send(new Uint8Array([9, 6, 0, 0, 0, 126, 8, 0, 0, 108, 27, 0, 0, 146, 23, 0, 0, 82, 23, 0, 0, 8, 91, 11, 0, 8, 91, 11, 0, 0, 0, 0, 0, 32, 78, 0, 0, 76, 79, 0, 0, 172, 38, 0, 0, 120, 155, 0, 0, 166, 39, 0, 0, 140, 35, 0, 0, 36, 44, 0, 0, 213, 37, 0, 0, 100, 0, 0, 0, 120, 55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 134, 6, 0, 0]));
+        this.sendPacket(9, { name: "Metrics", minFps: 21.74, maxFps: 70.2, currentFps: 60.34, averageFps: 59.7, framesRendered: 7442, framesInterpolated: 7442, framesExtrapolated: 0, allocatedNetworkEntities: 200, currentClientLag: 203, minClientLag: 99, maxClientLag: 398, currentPing: 101.5, minPing: 91, maxPing: 113, averagePing: 96.85, longFrames: 1, stutters: 142, group: 0, isMobile: 0, timeResets: 1, maxExtrapolationTime: 0, extrapolationIncidents: 0, totalExtrapolationTime: 0, differenceInClientTime: 16.7 });
     }
 };
 
