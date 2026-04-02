@@ -21,7 +21,7 @@ function onDayCycle(data) {
             const highestSpw = this.syncNeeds.scoreLogs.reduce((max, row) => Math.max(max, row[2]), 0);
             const aspw = this.syncNeeds.scoreLogs.slice(-20).reduce((sum, row) => sum + row[2], 0) / Math.min(this.syncNeeds.scoreLogs.length, 20);
             // add full data 
-            const entry = [this.myPlayer.wave, ~~this.myPlayer.score, ~~spw, ~~aspw, ~~highestSpw];
+            const entry = [this.myPlayer.wave, Math.floor(this.myPlayer.score), Math.floor(spw), Math.floor(aspw), Math.floor(highestSpw)];
             const lastIndex = this.syncNeeds.scoreLogs.length - 1;
             this.syncNeeds.scoreLogs[lastIndex] = entry;
             // broadcast to client

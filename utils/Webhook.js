@@ -9,7 +9,7 @@ if (config.id !== '' && config.token !== '') {
     // Check if webhook actually exists
     try {
         await webhook.send({
-            content: "Webhook connection intiated, Xperience likes smelly toes",
+            content: "Webhook connection initiated, Xperience likes smelly toes",
             username: "Skk",
             avatarURL: "https://cdn.wallpapersafari.com/64/11/WkyqrX.jpg"
         });
