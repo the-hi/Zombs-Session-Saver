@@ -53,7 +53,7 @@ function onRpc(data) {
             this.pop = 0;
             data.response.forEach((party) => this.pop += party.memberCount);
 
-            if (this.scripts.serverFullAlarm && this.pop === 32) playAudio(`${this.options.server} is full.`);
+            if (this.scripts.serverFullAlarm && this.pop === 40) playAudio(`${this.options.server} is full.`);
             break;
         case "ReceiveChatMessage":
             this.syncNeeds.messages.push(data);

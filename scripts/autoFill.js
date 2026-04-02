@@ -17,7 +17,7 @@ function autoFill() { // every 5 seconds
 
     if (count === 9) return; // max 9 sessions per server
 
-    if (this.ticks % 100 === 0 && (!this.syncNeeds.dayCycle.response.isDay && this.pop < 32)) {
+    if (this.ticks % 100 === 0 && (!this.syncNeeds.dayCycle.response.isDay && this.pop < 40)) {
         const { name, psk } = server;
         new Session({ server: this.options.server, name, psk });
         
