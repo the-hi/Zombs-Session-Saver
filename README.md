@@ -30,12 +30,15 @@ Session-Saver Installation Guide
 1.Download the project
 
   Clone the repository:
-   
+  ```
   git clone https://github.com/the-hi/Zombs-Session-Saver.git
-   
+  ```
   Or download the ZIP and extract it manually.
 
-  You need to download mpg123 if you're using linux: `sudo apt update && sudo apt install mpg123`
+  You need to download mpg123 if you're using linux: 
+  ```
+  sudo apt update && sudo apt install mpg123
+  ```
 
 ------------------------
 
@@ -52,9 +55,9 @@ Session-Saver Installation Guide
   Example:
 
   If your Webhook URL is:
-
-  `https://discord.com/api/webhooks/1408923573d34689458/_0AFMuvzMwktKeDXssIqSKf162-9wlEGsLlSay_Vzq_THyxfl9tVKqK73js_PU1vXz7hZ`
-
+  ```
+  https://discord.com/api/webhooks/1408923573d34689458/_0AFMuvzMwktKeDXssIqSKf162-9wlEGsLlSay_Vzq_THyxfl9tVKqK73js_PU1vXz7hZ
+  ```
   Then your config would be:
 
 ```js
@@ -66,14 +69,14 @@ export const config = {
 ------------------------
 
 4.Install node modules
-
+```
 npm install
-
+```
 ------------------------
 5.Run the project
-
-  node Start.js
-
+```
+node Start.js
+```
 ------------------------
 Done
 ----
