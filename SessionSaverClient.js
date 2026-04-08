@@ -52,10 +52,11 @@ const BINCODEC_PACKETS = {
 
 const [serverId, shareKey] = window.location.hash.replace("#/", "").split("/");
 
-document.querySelectorAll('.ad-unit, .hud-intro-youtuber, .hud-intro-footer, .hud-intro-more-games, .hud-intro-social, .hud-respawn-corner-bottom-left, .hud-respawn-twitter-btn, .hud-respawn-facebook-btn').forEach(el => el.remove());
+document.querySelector('.hud-intro-left').innerHTML = `<div class="ad-unit ad-unit-medrec ad-unit-medrec-atf" style="width: auto; height: auto;" bis_skin_checked="1"><div class="session_saver"></div></div>`;
+document.getElementsByClassName("hud-intro-guide")[0].style.width = "300px";
+document.getElementsByClassName("hud-intro-guide")[0].style.height = "282px";
 document.getElementsByClassName('hud-intro-form')[0].getElementsByTagName('label')[0].remove();
-
-document.getElementsByClassName("hud-intro-left")[0].innerHTML = `
+document.getElementsByClassName("session_saver")[0].innerHTML = `
     <h3>SESSION SAVER</h3>
     <h5></h5>
     <input class="SessionName" type="text" placeholder="Enter Session Name" maxlength="20">
@@ -72,117 +73,83 @@ document.getElementsByClassName("hud-intro-left")[0].innerHTML = `
     <button class="FillerOff" style="width: 22%"">Disable Server Filler</button>
     <button class="DisableAutoJoin" style="width: 22%">Disable Party Filler</button>
     <button class="DeleteAutoJoinPSK" style="width: 22%">Delete Party Key</button>
-`;
+    `;
 
 document.getElementsByClassName("hud-intro-guide")[0].innerHTML = `
+    <hr>
     <input class="SessionId" type="number" placeholder="Enter Session Id">
     <input class="SessionName" type="text" placeholder="Enter new name or type">
     <div class="change-session-controls">
         <button class="ChangeSessionName">Change Session Name</button>
         <button class="ChangeSessionName">Change Session Type</button>
     </div>
-
-    <p class="savedsessions"></p>
-`;
-document.getElementsByClassName("hud-intro")[0].insertAdjacentHTML("beforeend", `
-<div class="hud-intro-bottom">
-    <div id="server-controls">
-        <div class="servers">
-            <span>Host</span>
-            <select class='serverList'></select>
-        </div>
-        <div class="groups">
-            <span>Group</span>
-            <select class='typeList'><option>All</option></select>
-        </div>
-        <button class='btn btn-green ChangeServer'>Refresh List</button>
+    <div class="server-controls">
+        <select class='serverList'></select>
+        <select class='typeList'><option>all</option></select>
+        <button class='ChangeServer'>Change Server</button>
     </div>
-    <div class="saved-sessions"></div>
-</div>
-`);
+    <p class="savedsessions"></p>
+    <hr>
+    `;
 
+document.getElementsByClassName("hud-intro-corner-bottom-left")[0].remove();
+document.getElementsByClassName("hud-intro-corner-bottom-right")[0].remove();
 document.getElementsByClassName("hud-intro-form")[0].insertAdjacentHTML("beforeend", `<button class="btn btn-green hud-intro-play">Send Session</button>`);
+document.getElementsByClassName("hud-intro-left")[0].setAttribute("style", "width: 370px; height: 300px;");
+
 const cssStyles = `
-#hud-intro > div.hud-intro-wrapper > div > div.hud-intro-guide {
-    overflow: unset;
-    max-height: unset;
-}
-.hud-intro-guide > *:not(:first-child) {
-    margin-top: 10px;
-}
-.hud-intro-bottom {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    flex-wrap: wrap;
-    padding: 20px;
-    gap: 20px;
-    position: absolute;
-    bottom: 0px;
-    width: 100%;
-    min-height: 100px;
-    background: rgba(0, 0, 0, 0.4);
-}
-.hud-intro-bottom select, .hud-intro-bottom input {
-    display: inline-block;
-    min-width: 150px;
-    height: 50px;
-    line-height: 34px;
-    padding: 8px 14px;
-    background: #eee;
-    border: 2px solid #eee;
-    font-size: 14px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-    transition: all 0.15s ease-in-out;
-}
-.hud-intro-bottom button {
-    height: 50px;
-    line-height: 34px;
-}
-.hud-intro-bottom span {
-    font-family: 'Open Sans', sans-serif;
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.4);
-}
-.servers, .groups {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 5px;
-}
-#server-controls {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    gap: 10px;
-}
-.saved-sessions {
-    display: flex;
-    gap: 5px;
-    overflow-x: auto;
-}
-.saved-sessions button {
-    min-width: 100px;
-}
-`;
-/*
-const cssStyles = `
+    .session_saver, .hud-intro-guide {
+        background-color: #2c3e50;
+        border-radius: 8px;
+        text-color: #ecf0f1;
+    }
+
     .session_saver {
         text-align: center;
     }
+
+    hr {
+        border: none;
+        height: 1px;
+        background-color: #34495e;
+    }
+
     .change-session-controls {
         display: flex;
         gap: 2px;
     }
+
     .ChangeSessionName {
         display: inline-block;
         font-size: 12px;
     }
+
+    .hud-intro-main select, .hud-intro-main input {
+        width: 45%;
+        padding: 12px;
+        background-color: #34495e;
+        border: 2px solid transparent;
+        border-radius: 5px;
+        color: #ecf0f1;
+        font-size: 14px;
+        box-sizing: border-box;
+        transition: border-color 0.3s ease;
+    }
+
     .hud-party-icons {
         transform: translate(-30px, 15px);
         z-index: 12;
     }
+
+    .hud-intro-main input::placeholder {
+        color: #95a5a6;
+    }
+
+    .hud-intro-main input:focus, select:focus {
+        outline: none;
+        border-color: #3498db;
+    }
+
     .session_saver h5 {
         margin: 0px;
         white-space: normal;
@@ -190,6 +157,21 @@ const cssStyles = `
         overflow-wrap: break-word;
         user-select: text;
     }
+
+    .session_saver button, .hud-intro-guide button {
+        padding: 8px 8px;
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-size: 13px;
+        letter-spacing: 0.5px;
+        transition: all 0.2s ease;
+        min-height: 44px;
+    }
+
     .hud-intro-guide {
         min-height: 0;
     }
@@ -260,12 +242,14 @@ const cssStyles = `
         width: auto;
     }
 `;
-*/
 
 // Create and inject the stylesheet
 const styleSheet = document.createElement("style");
 styleSheet.innerText = cssStyles;
 document.head.appendChild(styleSheet);
+document.getElementsByClassName('hud-intro-server')[0].style.backgroundColor = '#34495e'
+document.getElementsByClassName('hud-intro-name')[0].style.backgroundColor = '#34495e'
+
 
 window.$ = (name) => document.getElementsByClassName(name);
 
@@ -634,9 +618,9 @@ const handleChatMessage = (message, packet) => {
 const filter = window.filterXSS ? window.filterXSS : Sanitize;
 
 const changeTypeList = () => {
-    $("saved-sessions")[0].innerHTML = ``;
+    $("savedsessions")[0].innerHTML = ``;
     Object.values(client.sessions).filter(session => $("typeList")[0].value === 'all' ? true : session.type === $("typeList")[0].value).forEach(e => {
-        $("saved-sessions")[0].innerHTML += `<button class='sessions' onclick="window.client.joinSession(${e.sessionId})">[${e.sessionId}] ${filter(e.sessionName)}</button>`;
+        $("savedsessions")[0].innerHTML += `<button class='sessions' onclick="window.client.joinSession(${e.sessionId})">[${e.sessionId}] ${filter(e.sessionName)}</button>`;
     });
 }
 
@@ -648,7 +632,7 @@ const handleSessions = (sessions) => {
     types.forEach(type => $("typeList")[0].innerHTML += `<option>${type}</option>`);
 
     Object.values(sessions).forEach(e => {
-        document.getElementsByClassName("saved-sessions")[0].innerHTML += `<button class='sessions' onclick="window.client.joinSession(${e.sessionId})">[${e.sessionId}] ${filter(e.sessionName)}</button>`;
+        document.getElementsByClassName("savedsessions")[0].innerHTML += `<button class='sessions' onclick="window.client.joinSession(${e.sessionId})">[${e.sessionId}] ${filter(e.sessionName)}</button>`;
     });
 };
 
@@ -744,7 +728,7 @@ class Client {
                 if (data.psks) {
                     $('session_saver')[0].getElementsByTagName('h5')[0].innerText = data.psks.join(", ")
                 }
-                $("saved-sessions")[0].innerHTML = ``;
+                $("savedsessions")[0].innerHTML = ``;
                 $('session_saver')[0].getElementsByTagName('h3')[0].innerText = `SESSION SAVER [${Object.values(this.sessions).length} Sockets]`
                 handleSessions(this.sessions);
                 break;
@@ -839,7 +823,7 @@ class Client {
     onClose() {
         window.client = undefined;
         $('session_saver')[0].getElementsByTagName('h3')[0].innerText = `SESSION SAVER`;
-        document.getElementsByClassName("saved-sessions")[0].innerHTML = ``;
+        document.getElementsByClassName("savedsessions")[0].innerHTML = ``;
         $('session_saver')[0].getElementsByTagName('h5')[0].innerText = ``;
         $("typeList")[0].innerHTML = `<option>all</option>`;
     }
