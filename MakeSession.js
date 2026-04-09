@@ -182,6 +182,7 @@ class Session {
 
     setBuildingTier() {
         if (!this.myStash) return;
+        this.autoUpgradeBuildings.clear();
         this.buildings.forEach(buildingData => {
             if (buildingData.type === 'GoldStash') return;
 
@@ -191,6 +192,7 @@ class Session {
 
     setBuildings() {
         if (!this.myStash) return;
+        this.autoRebuildBuildings.clear()
         this.buildings.forEach(buildingData => {
             if (buildingData.type === 'GoldStash') return;
 
