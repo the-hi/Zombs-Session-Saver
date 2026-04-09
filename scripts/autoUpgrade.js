@@ -9,9 +9,10 @@ function autoUpgrade() {
     this.missingAutoUpgradeBuildings.forEach(building => {
         if (processedTowers.has(building.uid)) return;
         // if the tower is supposed to be upgraded to the stash tier then dont delay upgrades
-        if (this.getDistance(building) < MAX_UPGRADE_DISTANCE && (building.tier === this.myStash.tier ? 20 : this.ticks + this.bumpUp) % 20 === 0) {
+        const originalBuilding = this.autoUpgradeBuildings.get(`${building.x - this.myStash.x},${building.y - this.myStash.y},${building.type}`);
+        if (this.getDistance(building) < MAX_UPGRADE_DISTANCE && (originalBuilding.tier === this.myStash.tier ? 20 : this.ticks + this.bumpUp) % 20 === 0) {
             // add the building to a set so multiple alts dont autoUpgrade if the building tier is lower than stash tier
-            if (building.tier !== this.myStash.tier) {
+            if (originalBuilding.tier !== this.myStash.tier) {
                 processedTowers.add(building.uid)
                 this.waitTicks(AUTO_UPGRADE_COOLDOWN_TICKS, () => processedTowers.delete(building.uid))
             }
