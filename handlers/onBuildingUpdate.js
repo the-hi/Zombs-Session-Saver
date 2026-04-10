@@ -1,8 +1,20 @@
 import { playAudio } from "../utils/Alarms.js";
 
+const justDied = new Set();
+
 function onBuildingUpdate(data) {
     data.forEach(building => {
         const { uid, x, y, type, tier, dead } = building;
+
+       // prevents a zombs bug where you receive building upgrade updates after the building dies.
+       /*
+          Example:-
+             Harvester upgraded to tier 1 {x: 10656, y: 2880, type: 'Harvester', dead: 0, uid: 1257322732} 
+             Harvester upgraded to tier 2 {x: 10656, y: 2880, type: 'Harvester', dead: 0, uid: 1257322732} 
+             Harvester died
+             Harvester upgraded to tier 3 {x: 10656, y: 2880, type: 'Harvester', dead: 0, uid: 1257322732} 
+        */        
+        if (justDied.has(uid)) return;
 
         if (!dead) {
             const stash = data.find(building => building.type == "GoldStash");
@@ -13,18 +25,6 @@ function onBuildingUpdate(data) {
             const relX = x - this.myStash.x;
             const relY = y - this.myStash.y;
             const position = `${relX},${relY},${type}`;
-
-            // prevents a zombs bug where you receive building upgrade updates after the building dies.
-            /*
-            Example:-
-                Harvester upgraded to tier 1 {x: 10656, y: 2880, type: 'Harvester', dead: 0, uid: 1257322732} 
-                Harvester upgraded to tier 2 {x: 10656, y: 2880, type: 'Harvester', dead: 0, uid: 1257322732} 
-                Harvester died
-                Harvester upgraded to tier 3 {x: 10656, y: 2880, type: 'Harvester', dead: 0, uid: 1257322732} 
-            */
-            if (!this.buildings.has(uid) && tier !== 1 && data.length === 1) {
-                return;
-            };
 
             this.buildings.set(uid, building);
 
@@ -46,6 +46,9 @@ function onBuildingUpdate(data) {
             };
         } else {
             this.buildings.delete(uid);
+            // add it to a set of towers that just died
+            justDied.add(uid)
+            this.waitTicks(10, () => justDied.delete(uid))
 
             if (type === 'GoldStash') {
                 this.myStash = undefined;
