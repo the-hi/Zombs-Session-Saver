@@ -1,6 +1,7 @@
 #!/bin/sh
 
 clear -x
+sudo -v
 
 # installing additional dependencies
 # node
@@ -14,7 +15,7 @@ fi
 # mpg123 (linux only)
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     echo "installing mpg123..."
-    sudo apt update && sudo apt install mpg123
+    apt update && apt install mpg123
 fi
 # pnpm
 if command -v pnpm &> /dev/null; then
@@ -35,7 +36,9 @@ else
         else
             echo "git is now installed (through homebrew)."
         fi
-    # doesnt support linux installation of git right now
+    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        apt update && apt install git
+        echo "git is now installed."
     else
         echo "git is not installed, try again later."
         exit 1
