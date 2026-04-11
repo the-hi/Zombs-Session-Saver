@@ -3,17 +3,27 @@
 clear -x
 
 # installing additional dependencies
+# node
+if command -v node &> /dev/null; then
+    echo "node is detected."
+else
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
+    \. "$HOME/.nvm/nvm.sh"
+    nvm install --lts
+fi
+# mpg123 (linux only)
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     echo "installing mpg123..."
     sudo apt update && sudo apt install mpg123
 fi
+# pnpm
 if command -v pnpm &> /dev/null; then
     echo "pnpm is detected."
 else
     echo "installing pnpm..."
     curl -fsSL https://get.pnpm.io/install.sh | sh - &> /dev/null
 fi
-
+# git
 if command -v git &> /dev/null; then
     echo "git is detected."
 else
@@ -39,6 +49,7 @@ cd "$PWD/Zombs-Session-Saver"
 echo "install dependencies..."
 pnpm install &> /dev/null
 
-echo "your session saver is now ready to be configured & used!\nconfigure your webhook in config.js and run the following to run the session saver:\n
+echo -e "your session saver is now ready to be configured & used!\nconfigure your webhook in config.js and run the following to run the session saver:\n
 cd ./Zombs-Session-Saver\npnpm run start
-"
+
+enjoy!"
