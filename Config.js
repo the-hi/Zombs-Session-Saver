@@ -10,14 +10,14 @@ const config = {
 
 
 if (config.killCamLength < 0.5) {
-    config.killCamLength = 0.5
-}
+    config.killCamLength = 0.5;
+};
 
 if (config.webhookUrl !== '') {
     const [id, token] = config.webhookUrl.replace('https://discord.com/api/webhooks/', '').split('/');
 
     config.id = id;
     config.token = token;
-}
+};
 
 export { config };
