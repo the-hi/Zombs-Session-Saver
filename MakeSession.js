@@ -39,8 +39,8 @@ class Scripts {
             playerTrickType: 'normal',
             autoAttackDistance: Infinity,
             lockAt: { x: 12000, y: 12000 },
-        }
-    }
+        };
+    };
 };
 
 const SAFE_SESSION_LIMIT = 12;
@@ -79,49 +79,49 @@ class Session {
         this.ws.onerror = () => { }
         this.ws.onclose = onClose.bind(this);
         this.ws.onmessage = onMessage.bind(this);
-    }
+    };
 
     broadCastPacket(opcode, packet, excludeId) {
         this.clients.forEach(client => {
             if (excludeId && client.id === excludeId) return;
             if (client.readyState === 1) client.sendPacket([opcode, ...packet]);
-        })
-    }
+        });
+    };
 
     sendPacket(event, data) {
         if (this.ws.readyState === 1) {
             this.ws.send(this.codec.encode(event, data));
-        }
-    }
+        };
+    };
 
     sendInput(data) {
         this.sendPacket(3, data);
-    }
+    };
 
     sendRpc(data) {
         this.sendPacket(9, data);
-    }
+    };
 
     upgradeBuilding(uid) {
         const building = this.buildings.get(uid);
 
         if (building) this.sendRpc({ name: "UpgradeBuilding", uid });
-    }
+    };
 
     sellBuilding(uid) {
         this.sendRpc({ name: "DeleteBuilding", uid });
-    }
+    };
 
     buyItem(itemName, tier) {
         this.sendRpc({ name: "BuyItem", itemName, tier });
-    }
+    };
 
     equipItem(itemName) {
         const item = this.syncNeeds.inventory[itemName];
         if (item) {
             this.sendRpc({ name: "EquipItem", itemName, tier: item.response.tier });
-        }
-    }
+        };
+    };
 
     getMovementPacket(yaw) {
         const movementPacket = {
@@ -131,7 +131,7 @@ class Session {
             left: +[225, 270, 315].includes(yaw)
         };
         return movementPacket;
-    }
+    };
 
     getMaxBuildingPerPlayer(type) {
         const buildingCount = {
@@ -140,17 +140,17 @@ class Session {
             "GoldMine": 8,
             "Harvester": 2,
             "SlowTrap": 12,
-        }
+        };
         return buildingCount[type] || 6;
-    }
+    };
 
     enoughPartyMembers(type, willDie) {
         const maxBuildingsPerPlayer = this.getMaxBuildingPerPlayer(type);
         const currentMaxBuildings = this.syncNeeds.partyInfo.response.length * (maxBuildingsPerPlayer);
         const currentBuildingCount = [...this.buildings.values()].filter(building => building.type === type).length;
-        // check if theres enough players to place one more building.
+        // check if there are enough players to place one more building.
         return ((currentBuildingCount + (willDie ? 0 : 1)) / currentMaxBuildings) <= 1;
-    }
+    };
 
     makeBuilding(type, { x, y }, yaw) {
         const halfWidth = ["Wall", "SlowTrap", "Door"].includes(type) ? 24 : 48;
@@ -158,7 +158,7 @@ class Session {
         const occupiedCells = this.SpatialHash.queryOccupiedCells(this.options.sessionId, { x, y }, halfWidth - 1);
 
         if (!occupiedCells) this.sendRpc({ name: "MakeBuilding", type, x, y, yaw });
-    }
+    };
 
     checkForCollision(player, { x, y }, towerSize, radius = 27) {
         const half = towerSize / 2;
@@ -168,7 +168,7 @@ class Session {
         const distance = Math.hypot(player.x - closestX, player.y - closestY);
 
         return distance <= radius;  // 27 is the collision radius
-    }
+    };
 
     checkInTower(player, building, width) {
         const inTower = (
@@ -178,7 +178,7 @@ class Session {
             player.y <= building.y + width
         );
         return inTower;
-    }
+    };
 
     setBuildingTier() {
         if (!this.myStash) return;
@@ -188,7 +188,7 @@ class Session {
 
             this.autoUpgradeBuildings.set(`${buildingData.x - this.myStash.x},${buildingData.y - this.myStash.y},${buildingData.type}`, buildingData);
         });
-    }
+    };
 
     setBuildings() {
         if (!this.myStash) return;
@@ -201,8 +201,8 @@ class Session {
             buildingData.yaw = entity?.yaw || 0;
             this.autoRebuildBuildings.set(`${buildingData.x - this.myStash.x},${buildingData.y - this.myStash.y},${buildingData.type}`, buildingData);
         });
-    }
-
+    };
+    
     getNearestEnemy(target = 'players') {
         if (target !== 'players' && target !== 'zombies') return undefined;
         if (this.lastEnemyCheck === this.ticks) return this.nearestEnemy;
@@ -216,7 +216,7 @@ class Session {
             if (distance < nearestDist) {
                 nearestDist = distance;
                 nearestEnemy = entity;
-            }
+            };
         });
 
         this.nearestDist = nearestDist;
@@ -224,41 +224,41 @@ class Session {
         this.nearestEnemy = nearestEnemy;
 
         return this.nearestEnemy;
-    }
+    };
 
     getDistance(entity) {
         const dx = this.myPlayer.position.x - entity.x;
         const dy = this.myPlayer.position.y - entity.y;
         return Math.hypot(dx, dy) | 0;
-    }
+    };
 
     getAngleTo(entity) {
         return (Math.atan2(entity.y - this.myPlayer.position.y, entity.x - this.myPlayer.position.x) * 180 / Math.PI + 450) % 360 | 0;
-    }
+    };
 
     waitTicks(ticks, callbackFunc) {
         const atTick = this.ticks + Math.ceil(ticks);
 
         this.tickCallBacks[atTick] ||= [];
         this.tickCallBacks[atTick].push(callbackFunc);
-    }
+    };
 
     loadLb() {
         this.sendPacket(7, {});
 
         for (let i = 0; i < 26; i++) this.sendInput({ up: 1, left: 1 });
         this.sendPacket(9, { name: "Metrics", minFps: 21.74, maxFps: 70.2, currentFps: 60.34, averageFps: 59.7, framesRendered: 7442, framesInterpolated: 7442, framesExtrapolated: 0, allocatedNetworkEntities: 200, currentClientLag: 203, minClientLag: 99, maxClientLag: 398, currentPing: 101.5, minPing: 91, maxPing: 113, averagePing: 96.85, longFrames: 1, stutters: 142, group: 0, isMobile: 0, timeResets: 1, maxExtrapolationTime: 0, extrapolationIncidents: 0, totalExtrapolationTime: 0, differenceInClientTime: 16.7 });
-    }
+    };
 };
 
 setInterval(() => {
-    if (global.gc) global.gc()
+    if (global.gc) global.gc();
     for (const server in servers) {
         if (servers[server].BreakIn) {
             const { name, psk } = servers[server];
             new Session({ server, type: 'normal', name, psk });
-        }
-    }
+        };
+    };
 }, 5000);
 
 export { Session, SESSIONS };
